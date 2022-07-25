@@ -1,0 +1,66 @@
+<%- include("partials/header") -%>
+<h1>Users</h1>
+<hr>
+
+<label>Curr Users:</label>
+<div class = "table">
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Calorie Requirement</th>
+            <th>Meals Plan</th>
+            <th>Date</th>
+        </tr>
+        <%items.forEach(function(item){%>
+            <tr>
+                <td><%=item.name%></td>
+                <td><%=item.calorieRequirement%></td>
+                <td><%=item.mealPlan.meals%></td>
+                <td><%=item.mealPlan.date%></td>
+            </tr>
+        <%});%>
+    </table>
+</div>
+<hr>
+
+<!-- Adding New Users -->
+<label>New User:</label><br>
+<form action = "/addUsers" method = "post">
+    <label>Name:</label><input type = "text" name = "name" autocomplete="off">
+    <label>Calorie Requirement:</label><input type = "number" name = "calReq" autocomplete="off" min = "1">
+    <label>Date:</label><input type = "number" name = "date" autocomplete="off" min = "1">
+    <label>Meals:</label>
+    <table style = "display: inline-block; margin:0px 10px">
+        <tr>
+            <th>Add</th>
+            <th>Name</th>
+            <th>Food Items</th>
+            <th>Category</th>
+        </tr>
+        <%meals.forEach(function(item){%>
+            <tr>
+                <td><input type="checkbox" name="checked" value="<%=item._id%>"></td>
+                <td><%=item.name%></td>
+                <td><%item.mealItems.forEach(function(it){%>
+                    <%=it.name%>,
+                <%});%></td>
+                <td><%=item.category%></td>
+            </tr>
+        <%});%>
+    </table>
+    <button type = "submit" class = "btn btn-primary" style = "margin:10px">Add User</button>
+</form>
+<hr>
+
+<!-- Meals and Food button -->
+<div class = "index-btns">
+    <form  action = "/food" method = "get">
+        <button type="submit" class = "btn btn-primary">Food Items</button>
+    </form>
+    <form action = "/meals" method = "get">
+        <button type="submit" class = "btn btn-primary">Meals</button>
+    </form>
+</div>
+<hr>
+
+<%- include("partials/footer") -%>
