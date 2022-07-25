@@ -1,0 +1,66 @@
+<%- include("partials/header") -%>
+<h1>Food Items</h1>
+<label>Curr Food Items:</label>
+<div class = "table">
+    <table>
+        <tr>
+            <th>Food</th>
+            <th>Calories</th>
+            <th>Protien</th>
+            <th>Fat</th>
+            <th>Carbohydrates</th>
+            <th>Water</th>
+            <th>Item Weight (in g)</th>
+        </tr>
+        <%items.forEach(function(item){%>
+            <tr>
+                <td><%=item.name%></td>
+                <td><%=item.calories%></td>
+                <td><%=item.protien%></td>
+                <td><%=item.fat%></td>
+                <td><%=item.carb%></td>
+                <td><%=item.water%></td>
+                <td><%=item.itemWeight.val%></td>
+            </tr>
+        <%});%>
+    </table>
+</div> 
+<hr>
+<div class = "addItem">
+    <label>New Food Item:</label> <br>
+    <form action = "/food" method = "post">
+        
+        <!-- Code to take input for all values of the itemSchema -->
+        <label>Name:</label><input type = "text" name = "name" autocomplete="off">
+        <label>Calories (Per 100g):</label><input type = "number" name = "cal" autocomplete="off" min = "1" max = "100">
+        <label>Protien (Per 100g):</label><input type = "number" name = "protien" autocomplete="off" min = "1" max = "100">
+        <label>Fat (Per 100g):</label><input type = "number" name = "fat" autocomplete="off" min = "1" max = "100">
+        <label>Carbohydrates (Per 100g):</label><input type = "number" name = "carb" autocomplete="off" min = "1" max = "100">
+        <label>Water (Per 100g):</label><input type = "number" name = "water" autocomplete="off" min = "1" max = "100">
+        <label>ItemWeight:</label><input type = "number" name = "wght" autocomplete="off" min = "1">
+        
+
+        <!-- Code to take input of one of the enum validators -->
+        <label>Unit:</label>
+        <select name="units">
+        <% units.forEach(function(unit){%>
+            <option value="<%=unit%>"><%=unit%></option>
+        <% });%>
+        </select>
+
+        <!-- Submit button -->
+        <button type = "submit" class = "btn btn-primary" style = "margin:10px">Add Item</button>
+    </form>
+</div>
+<hr>
+<!-- Meals and users button -->
+<div class = "index-btns">
+    <form  action = "/meals" method = "get">
+        <button type="submit" class = "btn btn-primary">Meals</button>
+    </form>
+    <form action = "/users" method = "get">
+        <button type="submit" class = "btn btn-primary">Users</button>
+    </form>
+</div>
+<hr>
+<%- include("partials/footer") -%>

@@ -1,0 +1,73 @@
+<%- include("partials/header") -%>
+<h1>Meals</h1>
+<label>Curr Meals:</label>
+<div class = "table">
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Food Items</th>
+            <th>Category</th>
+        </tr>
+        <%items.forEach(function(item){%>
+            <tr>
+                <td><%=item.name%></td>
+                <td><%=item.mealItems.size%></td>
+                <td><%=item.category%></td>
+            </tr>
+        <%});%>
+    </table>
+</div>
+<hr>
+
+<!-- Adding New meals -->
+<label>New Meal:</label><br>
+<form action = "/addMeals" method = "post">
+    <label>Name:</label><input type = "text" name = "name" autocomplete="off">
+    <label>Food Items:</label>
+    <table style = "display: inline-block; margin:0px 10px">
+        <tr>
+            <th>Add</th>
+            <th>Food</th>
+            <th>Calories</th>
+            <th>Protien</th>
+            <th>Fat</th>
+            <th>Carbohydrates</th>
+            <th>Water</th>
+            <th>Item Weight (in g)</th>
+        </tr>
+        <%foodItems.forEach(function(item){%>
+            <tr>
+                <td><input type="checkbox" name="checked" value="<%=item._id%>"></td>
+                <td><%=item.name%></td>
+                <td><%=item.calories%></td>
+                <td><%=item.protien%></td>
+                <td><%=item.fat%></td>
+                <td><%=item.carb%></td>
+                <td><%=item.water%></td>
+                <td><%=item.itemWeight.val%></td>
+            </tr>
+        <%});%>
+    </table>
+
+    <!-- Code to take input of category -->
+    <label>Category:</label>
+    <select name="category">
+        <% category.forEach(function(unit){%>
+            <option value="<%=unit%>"><%=unit%></option>
+        <% });%>
+    </select>
+    <button type = "submit" class = "btn btn-primary" style = "margin:10px">Add Meal</button>
+</form>
+<hr>
+
+<!-- Food and users button -->
+<div class = "index-btns">
+    <form  action = "/food" method = "get">
+        <button type="submit" class = "btn btn-primary">Food Items</button>
+    </form>
+    <form action = "/users" method = "get">
+        <button type="submit" class = "btn btn-primary">Users</button>
+    </form>
+</div>
+<hr>
+<%- include("partials/footer") -%>
