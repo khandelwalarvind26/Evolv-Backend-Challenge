@@ -5,7 +5,7 @@
     <table>
         <tr>
             <th>Name</th>
-            <th>Food Items</th>
+            <th>Food Items with quantity</th>
             <th>Category</th>
             <!-- <th>Edit</th> -->
         </tr>
@@ -14,7 +14,7 @@
                 <td><%=item.name%></td>
                 <td>
                 <%item.mealItems.forEach(function(it){%>
-                    <%=it.name%>,
+                    <%=it.food.name%>: <%=it.quantity%>,
                 <%});%>
                 </td>
                 <td><%=item.category%></td>
@@ -40,6 +40,7 @@
             <th>Carbohydrates</th>
             <th>Water</th>
             <th>Item Weight (in g)</th>
+            <th>Quantity</th>
         </tr>
         <%foodItems.forEach(function(item){%>
             <tr>
@@ -51,6 +52,7 @@
                 <td><%=item.carb%></td>
                 <td><%=item.water%></td>
                 <td><%=item.itemWeight.val%></td>
+                <td><input type = "number" name = "quantity" min = "0"></td>
             </tr>
         <%});%>
     </table>

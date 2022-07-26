@@ -44,8 +44,8 @@ const mealSchema = new mongoose.Schema({
     category:String,
     name:String,
     mealItems:[{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'Food'
+        food:{type:mongoose.Schema.Types.ObjectId, ref:'Food'},
+        quantity:Number
     }]
 });
 const Meal = mongoose.model('Meal',mealSchema);
@@ -99,7 +99,7 @@ app.get("/meals",function(req,res) {
                 else {
                     res.render("meals",{items:items,foodItems:foodItems,category:category});
                 }
-            }).populate('mealItems');
+            }).populate('mealItems.food');
         }
     });
     
@@ -110,10 +110,10 @@ app.get("/meals",function(req,res) {
 //Rendering users.ejs when /users is visited
 app.get("/users",function(req,res) {
 
-    Meal.find({}).populate("mealItems").exec(function(err,meals) {
+    Meal.find({}).populate("mealItems.food").exec(function(err,meals) {
         if(err) console.log(err);
         else {
-            User.find({}).populate("mealPlan.meals").populate("").exec(function(err2,items) {
+            User.find({}).populate("mealPlan.meals").populate("mealPlan.meals.mealItems.food").exec(function(err2,items) {
                 if(err2) console.log(err2);
                 else {
                     res.render("users",{items:items,meals:meals});
@@ -149,11 +149,27 @@ app.post("/food",function(req,res){
 
 //Handling post request to /meal when a new item is added
 app.post("/addMeals",function(req,res){
+    // console.log(req.body);
+    const quant = req.body.quantity;
+    for(let i = 0; i < quant.length; i++) {
+        // console.log(i);
+        // console.log(quant[i]);
+        if(quant[i] === '' || quant[i] === '0') {quant.splice(i,1); i--;}
+    }
+    let objArr = []
+    for(let i = 0; i < req.body.checked.length; i++) {
+        const obj = {
+            food:req.body.checked[i],
+            quantity:quant[i]
+        };
+        objArr.push(obj);
+    }
+    console.log(objArr);
     const curr = new Meal({
         name:req.body.name,
         validCategory:req.body.category,
         category:req.body.category,
-        mealItems:req.body.checked
+        mealItems:objArr
     });
     // console.log(curr.mealItems);
     curr.save(function(err) {

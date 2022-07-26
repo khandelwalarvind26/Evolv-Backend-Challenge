@@ -15,7 +15,11 @@
             <tr>
                 <td><%=item.name%></td>
                 <td><%=item.calorieRequirement%></td>
-                <td><%=item.mealPlan.meals%></td>
+                <td>
+                <%item.mealPlan.meals.forEach(function(it) { %>
+                    <%=it.name%>,
+                <%})%>
+                </td>
                 <td><%=item.mealPlan.date%></td>
             </tr>
         <%});%>
@@ -42,7 +46,7 @@
                 <td><input type="checkbox" name="checked" value="<%=item._id%>"></td>
                 <td><%=item.name%></td>
                 <td><%item.mealItems.forEach(function(it){%>
-                    <%=it.name%>,
+                    <%=it.food.name%>: <%=it.quantity%>,
                 <%});%></td>
                 <td><%=item.category%></td>
             </tr>
