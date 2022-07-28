@@ -43,3 +43,13 @@ input[type= "number"] {
     margin:10px;
     width:50px;
 }
+
+.link {
+    color:#000;
+    text-decoration: none;
+}
+
+.link:hover {
+    color:#1a8bbc;
+    text-decoration: underline;
+}

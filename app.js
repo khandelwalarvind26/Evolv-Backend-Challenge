@@ -75,58 +75,21 @@ app.get("/",function(req,res){
 
 
 
-//Rendering Food items when this page is visited
+//Get and post requests for food
 const units = ['g','kg','ml','l'];
-app.get("/food",function(req,res) {
+
+app.route('/food')
+
+.get(function(req,res) {
     Food.find({},function(err,items){
         if(err)console.log(err)
         else {
             res.render("food",{items:items,units:units});
         }
     });
-});
+})
 
-
-
-//Rendering Meals.ejs when /meals is visited
-const category = ['Breakfast', 'Lunch', 'Evening Snack', 'Dinner'];
-app.get("/meals",function(req,res) {
-    Food.find({},function(err,foodItems){
-        if(err)console.log(err)
-        else {
-            Meal.find({},function(err,items) {
-                if(err)console.log(err)
-                else {
-                    res.render("meals",{items:items,foodItems:foodItems,category:category});
-                }
-            }).populate('mealItems.food');
-        }
-    });
-    
-});
-
-
-
-//Rendering users.ejs when /users is visited
-app.get("/users",function(req,res) {
-
-    Meal.find({}).populate("mealItems.food").exec(function(err,meals) {
-        if(err) console.log(err);
-        else {
-            User.find({}).populate("mealPlan.meals").populate("mealPlan.meals.mealItems.food").exec(function(err2,items) {
-                if(err2) console.log(err2);
-                else {
-                    res.render("users",{items:items,meals:meals});
-                }
-            });
-        }
-    });
-});
-
-
-
-//Handling post request to /food when a new item is added
-app.post("/food",function(req,res){
+.post(function(req,res){
     console.log(req.body);
     const item = new Food({
         name:req.body.name,
@@ -147,15 +110,36 @@ app.post("/food",function(req,res){
 
 
 
-//Handling post request to /meal when a new item is added
-app.post("/addMeals",function(req,res){
-    // console.log(req.body);
+
+
+
+//Get, post and patch functions for /meals route
+const category = ['Breakfast', 'Lunch', 'Evening Snack', 'Dinner'];
+
+app.route('/meals')
+
+.get(function(req,res) {
+    Food.find({},function(err,foodItems){
+        if(err)console.log(err)
+        else {
+            Meal.find({},function(err,items) {
+                if(err)console.log(err)
+                else {
+                    res.render("meals",{items:items,foodItems:foodItems,category:category});
+                }
+            }).populate('mealItems.food');
+        }
+    });
+    
+})
+
+.post(function(req,res){
+    // Remove empty elements from the input quantity array
     const quant = req.body.quantity;
     for(let i = 0; i < quant.length; i++) {
-        // console.log(i);
-        // console.log(quant[i]);
         if(quant[i] === '' || quant[i] === '0') {quant.splice(i,1); i--;}
     }
+    //Pushing all objects into a temp array
     let objArr = []
     for(let i = 0; i < req.body.checked.length; i++) {
         const obj = {
@@ -165,22 +149,55 @@ app.post("/addMeals",function(req,res){
         objArr.push(obj);
     }
     console.log(objArr);
+    //Creating the new temp obj and saving it
     const curr = new Meal({
         name:req.body.name,
         validCategory:req.body.category,
         category:req.body.category,
         mealItems:objArr
     });
-    // console.log(curr.mealItems);
     curr.save(function(err) {
         if(err)console.log(err);
     });
+    //Redirecting it back to /meals
     res.redirect("/meals");
+})
+
+//To make patch request, have field id containing id of meal to be updated and then the fields that are to be patched
+.patch(function(req,res){
+    const id = req.body.id;
+    const temp = req.body;
+    delete temp.id;
+    console.log(id);
+    Meal.updateOne(
+        {_id:id},
+        {$set:temp},
+        function(err) {if(err) res.send(err);
+        else res.send("Success");}
+    );
 });
 
 
-//Handling post request on /addUsers to add new users
-app.post("/addUsers",function(req,res){
+
+
+//Get and post requests for route /users
+app.route('/users')
+
+.get(function(req,res) {
+    Meal.find({}).populate("mealItems.food").exec(function(err,meals) {
+        if(err) console.log(err);
+        else {
+            User.find({}).populate("mealPlan.meals").populate("mealPlan.meals.mealItems.food").exec(function(err2,items) {
+                if(err2) console.log(err2);
+                else {
+                    res.render("users",{items:items,meals:meals});
+                }
+            });
+        }
+    });
+})
+
+.post(function(req,res){
     const curr = new User({
         name:req.body.name,
         calorieRequirement:req.body.calReq,
@@ -196,31 +213,22 @@ app.post("/addUsers",function(req,res){
     res.redirect('/users');
 })
 
-
-
-//Handle post requeusts /mealspatch to patch meals with patch api
-// app.post("/mealsPatch",function(req,res) {
-//     console.log(req.body);
-//     const id = req.body.checked;
-//     Food.find({},function(err,foodItems){
-//         if(err)console.log(err)
-//         else {
-//             Meal.findById(id,function(err,item) {
-//                 if(err)console.log(err)
-//                 else {
-//                     res.render("mealsPatch",{item:item,foodItems:foodItems,category:category});
-//                 }
-//             }).populate('mealItems');
-//         }
-//     });
-// });
+//To make patch request, have field id containing id of user to be updated and then the fields that are to be patched
+.patch(function(req,res){
+    const id = req.body.id;
+    const temp = req.body;
+    delete temp.id;
+    console.log(id);
+    User.updateOne(
+        {_id:id},
+        {$set:temp},
+        function(err) {if(err) res.send(err);
+        else res.send("Success");}
+    );
+});
 
 
 
-//Handle patch request to /patchMeal
-// app.post("/patchMeal",function(req,res) {
-//     console.log(req.body);
-// });
 
 //Setting up the server to listen on localhost:3000/
 app.listen(3000,function(){console.log("Server started on port 3000")});
