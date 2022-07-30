@@ -76,55 +76,30 @@ app.get("/",function(req,res){
 
 
 //Level 3 : Algorithm to create ideal meal given number of calories
-//Not working as 
+//The basic approach of the problem will be using Unbounded Knapsack. WhereIn I will include some possible quantities of all items and not include some items.
+//In this way, The algorithm will create an array all possible combinations of selecting food items such that quantity is <=2 & >=5 and the calorie requirement is satisfied
+//Now, I will iterate over these combinations and check the protien/calorie ratio for each of them and return the ones which satisfy the ratio
+//The Implementation of recursive function is under progress as of now 
+function recurse(curr_cal, target_cal, curr_quantity,currArr,ind,foodItems) {
+    if(curr_cal > target_cal +100) return;
+    if(ind >= foodItems.length || curr_quanity == 5) {
+        if(curr_quantity >= 2 && curr_cal >= target_cal-100 && curr_cal <= target_cal+100) {
+            objArr.push(currArr);
+        } 
+        return;
+    }
+    else if(curr_quantity < 5) {
+
+    }
+
+} 
 app.post('/create',function(req,res) {
     let calories = req.body.calories;
     let foodItems = [];
     let objArr = [];
-    //Only consider elements which have max calorie requirement
     Food.find({calories:{$lte:calories*4}},function(err,items) {
-        // console.log(items);
         foodItems = items;
-        //Sorting all items in increasing order of calories/protien ratio
-        foodItems.sort(function(a,b){
-            return a.calories/a.protien - b.calories/b.protien;
-        });
-        //Selecting whole number quantities of 2-5 items while calories is in range
-        // let curr_cal = 0;
-        // let diffItems = 0;
-        // foodItems.forEach(function(res) {
-        //     if(diffItems < 5 && curr_cal < calories+100) {
-        //         let rem_cal= calories+100 - curr_cal;
-        //         let remItems = 5-diffItems;
-        //         let k = rem_cal/remItems;
 
-        //     }
-        // });
-        // console.log(foodItems);
-        let start = -1, end = -1;
-        let l = 40/3, r = 20;
-        foodItems.forEach(function(item,ind) {
-            if(item.calories/item.protien >= l && item.calories/item.protien <= r) {
-                if(start == -1) start = ind;
-                end = ind;
-            }
-        });
-        const len = foodItems.length;
-        let mealItems = [];
-        //If there are sufficient elements in the range of 20-30% choose min 2 and max 5 items of those
-        if(end - start >= 2) {
-
-        }
-        //If there aren't min 2 elements in the range, run 2 for loops and find any 2 items whose ratios will 20-30% protien/calories
-        else {
-            for(let i = 0; i < len; i++) {
-                for(let j = 0; j < len; j++) {
-                    if(i != j) {
-                        // item[i].calories + 
-                    }
-                }
-            }
-        }
     });
     res.send("Done");
 });
