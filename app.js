@@ -75,6 +75,62 @@ app.get("/",function(req,res){
 
 
 
+//Level 3 : Algorithm to create ideal meal given number of calories
+//Not working as 
+app.post('/create',function(req,res) {
+    let calories = req.body.calories;
+    let foodItems = [];
+    let objArr = [];
+    //Only consider elements which have max calorie requirement
+    Food.find({calories:{$lte:calories*4}},function(err,items) {
+        // console.log(items);
+        foodItems = items;
+        //Sorting all items in increasing order of calories/protien ratio
+        foodItems.sort(function(a,b){
+            return a.calories/a.protien - b.calories/b.protien;
+        });
+        //Selecting whole number quantities of 2-5 items while calories is in range
+        // let curr_cal = 0;
+        // let diffItems = 0;
+        // foodItems.forEach(function(res) {
+        //     if(diffItems < 5 && curr_cal < calories+100) {
+        //         let rem_cal= calories+100 - curr_cal;
+        //         let remItems = 5-diffItems;
+        //         let k = rem_cal/remItems;
+
+        //     }
+        // });
+        // console.log(foodItems);
+        let start = -1, end = -1;
+        let l = 40/3, r = 20;
+        foodItems.forEach(function(item,ind) {
+            if(item.calories/item.protien >= l && item.calories/item.protien <= r) {
+                if(start == -1) start = ind;
+                end = ind;
+            }
+        });
+        const len = foodItems.length;
+        let mealItems = [];
+        //If there are sufficient elements in the range of 20-30% choose min 2 and max 5 items of those
+        if(end - start >= 2) {
+
+        }
+        //If there aren't min 2 elements in the range, run 2 for loops and find any 2 items whose ratios will 20-30% protien/calories
+        else {
+            for(let i = 0; i < len; i++) {
+                for(let j = 0; j < len; j++) {
+                    if(i != j) {
+                        // item[i].calories + 
+                    }
+                }
+            }
+        }
+    });
+    res.send("Done");
+});
+
+
+
 //Get and post requests for food
 const units = ['g','kg','ml','l'];
 
@@ -140,7 +196,7 @@ app.route('/meals')
         if(quant[i] === '' || quant[i] === '0') {quant.splice(i,1); i--;}
     }
     //Pushing all objects into a temp array
-    let objArr = []
+    let objArr = [];
     for(let i = 0; i < req.body.checked.length; i++) {
         const obj = {
             food:req.body.checked[i],
@@ -226,8 +282,6 @@ app.route('/users')
         else res.send("Success");}
     );
 });
-
-
 
 
 //Setting up the server to listen on localhost:3000/
