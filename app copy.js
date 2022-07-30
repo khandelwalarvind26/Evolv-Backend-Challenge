@@ -79,40 +79,42 @@ app.get("/",function(req,res){
 //The basic approach of the problem will be using Unbounded Knapsack. WhereIn I will include some possible quantities of all items and not include some items.
 //In this way, The algorithm will create an array all possible combinations of selecting food items such that quantity is <=2 & >=5 and the calorie requirement is satisfied
 //Now, I will iterate over these combinations and check the protien/calorie ratio for each of them and return the ones which satisfy the ratio
+//The Implementation of recursive function is under progress as of now 
 
-
-//Currently algorithm is able to filter the required combinations out of all possible combinations which means the logic is working flawlessly but, Due to referencing issues in recursion, it is unable to process the meal items.
-let no = 0;
-function recurse(curr_cal,curr_protien, target_cal, curr_quantity,currArr,ind,foodItems,objArr) {
-    no++;
-    // console.log(curr_quantity);
+function recurse(curr_cal, target_cal, curr_quantity,currArr,ind,foodItems,objArr) {
+    // console.log(ind);
     if(curr_cal > target_cal) return;
     if(ind >= foodItems.length || curr_quantity == 5) {
         // if(curr_cal <=target_cal) console.log(curr_cal);
-        if(curr_quantity >= 2 && curr_cal >= target_cal-200 && curr_cal <= target_cal && (curr_cal/curr_protien)>=(40/3) && (curr_cal/curr_protien)<=(20)) {
-            console.log((currArr));
-            // console.log(curr_quantity);
+        if(curr_quantity >= 2 && curr_cal >= target_cal-200 && curr_cal <= target_cal) {
+            console.log(currArr);
             // objArr.push(currArr);
             // if(objArr.length === 162) console.log(1);
         } 
         return;
     }
     else if(curr_quantity < 5) {
+        // console.log(1);
         // let cond = 0;
         let req_cal = target_cal - curr_cal;
+        // console.log(foodItems[ind].calories);
+        // console.log(req_cal);
         //if calories in 100gm portion of currItem is less than available calories, select fractional portions
         if(foodItems[ind].calories < req_cal){
+            // console.log(foodItems[ind].calories);
             for(let i = 1; i <= 5; i++) {
                 if(foodItems[ind].calories*i <= req_cal) {
                     currArr.push([ind,i]);
-                    recurse(curr_cal + foodItems[ind].calories*i,curr_protien+foodItems[ind].protien*i,target_cal, curr_quantity+1,currArr,ind+1,foodItems,objArr);
+                    curr_cal += foodItems[ind].calories*i;
+                    recurse(curr_cal,target_cal, curr_quantity+1,currArr,ind+1,foodItems,objArr);
                     currArr.pop();
+                    curr_cal -= foodItems[ind].calories*i;
                 }
             }
         }
 
         //Not selecting any quantity of curr item
-        recurse(curr_cal,curr_protien, target_cal, curr_quantity,currArr,ind+1,foodItems,objArr);
+        recurse(curr_cal, target_cal, curr_quantity,currArr,ind+1,foodItems,objArr);
     }
 
 } 
@@ -121,15 +123,16 @@ app.post('/create',function(req,res) {
     let calories = parseInt(req.body.calories);
     let foodItems = [];
     // console.log(calories);
-    Food.find({calories:{$lte:calories*4}},function(err,items) {
+    Food.find({},function(err,items) {
         foodItems = items;
+        // console.log(foodItems.length);
         let currArr = [];
         let objArr = [];
-        recurse(0,0,calories+100,0,currArr,0,foodItems,objArr);
+        recurse(0,calories+100,0,currArr,0,foodItems,objArr);
         // console.log(calories+100);
-        console.log(no);
+        // console.log(currArr);
     });
-    res.send("Currently algorithm is able to filter the required combinations out of all possible combinations which means the logic is working flawlessly but, Due to referencing issues in recursion, it is unable to process the meal items.<br>*****See log for index and quanities of food items*****");
+    res.send("Done");
 });
 
 app.get('/create',function(req,res) {
