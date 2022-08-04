@@ -1,28 +1,36 @@
 <%- include("partials/header") -%>
-<div class = "table">
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Food Items with quantity</th>
-            <th>Category</th>
-            <!-- <th>Edit</th> -->
-        </tr>
-        <%items.forEach(function(item){%>
-            <tr>
-                <td><%=item.name%></td>
-                <td>
-                <%item.mealItems.forEach(function(it){%>
-                    <%=it.food.name%>: <%=it.quantity%>,
-                <%});%>
-                </td>
-                <td><%=item.category%></td>
-                <!-- <form action = "/mealsPatch" method = "post"><td><input type="checkbox" name="checked" value="<%=item._id%>" onchange = "this.form.submit()"></td></form> -->
-            </tr>
-        <%});%>
-    </table>
-</div>
+    <div class="table">
+        <form action='/save' method="post">
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Food Items with quantity</th>
+                    <th>Category</th>
+                    <th>Save</th>
+                </tr>
+                <%items.forEach(function(item){%>
+                    <tr>
+                        <td>
+                            <%=item.name%>
+                        </td>
+                        <td>
+                            <%item.mealItems.forEach(function(it){%>
+                                <%=it.food.name%>: <%=it.quantity%>,
+                                        <%});%>
+                        </td>
+                        <td>
+                            <%=item.category%>
+                        </td>
+                        <td><input type="checkbox" name="checked" value="<%=item._id%>"></td>
 
-<form  action = "/clear" method = "POST">
-    <button type="submit" class = "btn btn-primary">Clear</button>
-</form>
-<%- include("partials/footer") -%>
+                    </tr>
+                <%});%>
+            </table>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
+
+    <form action="/clear" method="POST">
+        <button type="submit" class="btn btn-primary">Clear</button>
+    </form>
+    <%- include("partials/footer") -%>

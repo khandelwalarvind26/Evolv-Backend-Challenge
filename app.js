@@ -30,7 +30,7 @@ const foodSchema = new mongoose.Schema({
     acceptedUnit: {
         enum: ['ml', 'liter', 'kg', 'g']
     },
-    itemWeight: { val: { type: Number, min: 1, max: 100 }, units: { type: String, enum: 'g' } }
+    itemWeight: { val: Number, units: { type: String, enum: 'g' } }
 });
 const Food = mongoose.model('Food', foodSchema);
 
@@ -38,18 +38,18 @@ const Food = mongoose.model('Food', foodSchema);
 
 //Meals Schema
 const mealSchema = new mongoose.Schema({
+    name: String,
     validCategory: {
         enum: ['Breakfast', 'Lunch', 'Evening Snack', 'Dinner']
     },
     category: String,
-    name: String,
     mealItems: [{
         food: { type: mongoose.Schema.Types.ObjectId, ref: 'Food' },
         quantity: Number
     }]
 });
 const Meal = mongoose.model('Meal', mealSchema);
-const CalorieMeal = mongoose.model('CalorieMeal',mealSchema);
+const CalorieMeal = mongoose.model('CalorieMeal', mealSchema);
 //Categories
 const category = ['Breakfast', 'Lunch', 'Evening Snack', 'Dinner'];
 
@@ -79,7 +79,7 @@ app.get("/", function (req, res) {
 
 //Level 3 : Algorithm to create ideal meal given number of calories
 //The basic approach of the problem will be using Unbounded Knapsack. WhereIn I will include some possible quantities of all items and not include some items.
-//In this way, The algorithm will create an array all possible combinations of selecting food items such that quantity is <=2 & >=5 and the calorie requirement is satisfied
+//In this way, The algorithm will create an array of all possible combinations of selecting food items such that quantity is <=2 & >=5 and the calorie requirement is satisfied
 //Now, I will iterate over these combinations and check the protien/calorie ratio for each of them and return the ones which satisfy the ratio
 
 
@@ -89,9 +89,8 @@ function recurse(curr_cal, curr_protien, target_cal, curr_quantity, currArr, ind
     no++;
     if (curr_cal > target_cal || objArr.length >= 10) return;
     if (ind >= foodItems.length || curr_quantity == 5) {
-        if (curr_quantity >= 2 && curr_cal >= target_cal - 200 && curr_cal <= target_cal && (curr_cal / curr_protien) >= (40 / 3) && (curr_cal / curr_protien) <= (20)) {
-            let obj = {curArr: []}
-            // console.log(currArr);
+        if (curr_quantity >= 2 && curr_cal >= target_cal - 200 && curr_cal <= target_cal && (curr_cal / curr_protien) >= (40 / 3) && (curr_cal / curr_protien) <= 20) {
+            let obj = { curArr: [] }
             currArr.forEach(function (item) {
                 obj.curArr.push(item);
             });
@@ -117,22 +116,23 @@ function recurse(curr_cal, curr_protien, target_cal, curr_quantity, currArr, ind
     }
 }
 
+app.get('/create', function (req, res) {
+    res.render('create');
+});
+
 app.post('/create', function (req, res) {
     let calories = parseInt(req.body.calories);
     let foodItems = [];
-
-    
     Food.find({ calories: { $lte: calories * 4 } }, function (err, items) {
-        // CalorieMeal.collection.drop();
         foodItems = items;
         let currArr = [];
         let objArr = [];
-
+        no = 0;
         //This function returns an objArr which contains quantity and index of all food items in the meals
-        recurse(0, 0, calories + 100, 0, currArr, 0, foodItems,objArr);
-        
+        recurse(0, 0, calories + 100, 0, currArr, 0, foodItems, objArr);
+
         //Now iterating over these meals and adding them to an array of meal objects
-        objArr.forEach(function(item,index) {
+        objArr.forEach(function (item, index) {
             let mealItems = [];
             for (let i = 0; i < item.curArr.length; i++) {
                 const obj = {
@@ -142,32 +142,46 @@ app.post('/create', function (req, res) {
                 mealItems.push(obj);
             }
             const curr = new CalorieMeal({
-                name:'meal'+index,
-                validCategory:'Breakfast',
-                category:'Breakfast',
-                mealItems:mealItems
+                name: 'meal' + index,
+                validCategory: 'Breakfast',
+                category: 'Breakfast',
+                mealItems: mealItems
             });
             curr.save();
         });
         CalorieMeal.find({}, function (err, items) {
             if (err) console.log(err)
             else {
-                res.render("created", { items: items});
-                // console.log(items);
+                res.render("created", { items: items });
             }
         }).populate('mealItems.food');
-        console.log(no);
+    });
+
+});
+
+
+//Save the generated meals
+app.post('/save', function (req, res) {
+    req.body.checked.forEach(function(id){
+        CalorieMeal.findById(id,function(err,item) {
+            const curr = new Meal({
+                name:item.name,
+                validCategory:item.validCategory,
+                category:item.category,
+                mealItems:item.mealItems
+            });
+            curr.save();
+        });
     });
     
+    res.redirect('/users');
 });
 
-app.get('/create', function (req, res) {
-    res.render('create');
-});
 
-app.post('/clear',function(req,res){
+app.post('/clear', function (req, res) {
     CalorieMeal.collection.drop();
-    res.redirect('/')
+    console.log('deleted');
+    res.redirect('/');
 });
 
 
@@ -264,7 +278,6 @@ app.route('/meals')
         const id = req.body.id;
         const temp = req.body;
         delete temp.id;
-        console.log(id);
         Meal.updateOne(
             { _id: id },
             { $set: temp },
@@ -316,7 +329,6 @@ app.route('/users')
         const id = req.body.id;
         const temp = req.body;
         delete temp.id;
-        console.log(id);
         User.updateOne(
             { _id: id },
             { $set: temp },
