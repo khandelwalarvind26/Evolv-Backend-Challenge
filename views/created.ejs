@@ -5,10 +5,12 @@
                 <tr>
                     <th>Name</th>
                     <th>Food Items with quantity</th>
+                    <th>Protien</th>
                     <th>Category</th>
                     <th>Save</th>
+
                 </tr>
-                <%items.forEach(function(item){%>
+                <%items.forEach(function(item,index){%>
                     <tr>
                         <td>
                             <%=item.name%>
@@ -17,6 +19,9 @@
                             <%item.mealItems.forEach(function(it){%>
                                 <%=it.food.name%>: <%=it.quantity%>,
                                         <%});%>
+                        </td>
+                        <td>
+                            <%=protien[index]%>
                         </td>
                         <td>
                             <%=item.category%>

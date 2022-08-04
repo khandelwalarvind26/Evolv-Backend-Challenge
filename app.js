@@ -152,7 +152,21 @@ app.post('/create', function (req, res) {
         CalorieMeal.find({}, function (err, items) {
             if (err) console.log(err)
             else {
-                res.render("created", { items: items });
+                let totalProtien = [];
+                console.log(items);
+                items.forEach(function(item){
+                    let curr_protien = 0;
+                    // item.mealItems[0]
+                    item.mealItems.forEach(function(food) {
+                            curr_protien += food.food.protien*(food.quantity);
+                        // console.log(food.food.protien);
+                    });
+                    // console.log(item.name);
+                    totalProtien.push(curr_protien);
+                });
+                // totalProtien*=4;
+                // console.log(totalProtien);
+                res.render("created", { items: items , protien:totalProtien});
             }
         }).populate('mealItems.food');
     });
